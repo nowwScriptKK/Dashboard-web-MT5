@@ -2,7 +2,7 @@
 
 A comprehensive, high-performance trading operating system powered by AI and real-time data analysis.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/GgXTqxk_BHE?si=UIOgBUArtL5_jeQP" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![Alt text](https://img.youtube.com/vi/VID/0.jpg)](https://www.youtube.com/watch?v=GgXTqxk_BHE)
 
 ## Overview
 
@@ -87,4 +87,5 @@ The server will start at `http://localhost:5000`.
 ### MetaTrader 5 Integration
 1.  Copy the scripts from the `MQ5` directory to your MT5 `MQL5/Scripts` folder.
 2.  Attach `CandleDataSender.mq5` to the charts you wish to monitor.
+
 
