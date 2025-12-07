@@ -2,6 +2,8 @@
 
 A comprehensive, high-performance trading operating system powered by AI and real-time data analysis.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/GgXTqxk_BHE?si=UIOgBUArtL5_jeQP" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Overview
 
 Trading AI Booster is designed to automate trading analysis, manage risk, and execute trades based on economic announcements and technical indicators. It features a robust backend, a real-time dashboard, and integration with MetaTrader 5 via MQ5 scripts.
@@ -85,3 +87,4 @@ The server will start at `http://localhost:5000`.
 ### MetaTrader 5 Integration
 1.  Copy the scripts from the `MQ5` directory to your MT5 `MQL5/Scripts` folder.
 2.  Attach `CandleDataSender.mq5` to the charts you wish to monitor.
+
