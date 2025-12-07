@@ -4,7 +4,7 @@ A comprehensive, high-performance trading operating system powered by AI and rea
 
 [![Vidéo exemple](https://img.youtube.com/vi/GgXTqxk_BHE/0.jpg)](https://www.youtube.com/watch?v=GgXTqxk_BHE)
 
-Free announce : https://t.me/XAUUSD_AlertingBOT
+Free announce : https://t.me/XAUUSD_AlertingBOT (1/2 ads per day 80+ coeficiency trust, Please note, this Telegram group is not an investment advice service; it analyzes economic announcements as examples.)
 
 Contact : https://t.me/Theglitchis
 
@@ -91,6 +91,7 @@ The server will start at `http://localhost:5000`.
 ### MetaTrader 5 Integration
 1.  Copy the scripts from the `MQ5` directory to your MT5 `MQL5/Scripts` folder.
 2.  Attach `CandleDataSender.mq5` to the charts you wish to monitor.
+
 
 
 
