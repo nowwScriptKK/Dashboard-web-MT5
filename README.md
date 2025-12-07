@@ -84,13 +84,15 @@ python run.py
 The server will start at `http://localhost:5000`.
 
 ### Accessing the Interface
-- **Dashboard**: `http://localhost:5000/dashboard`
+- **Dashboard**: `http://localhost:5000/dashboard/`
+- **announcements**: `http://localhost:5000/announcements/`
+- **statistics**: `http://localhost:5000/statistics/`
+- **Telegram**: `http://localhost:5000/telegram/`
 - **Admin Panel**: `http://localhost:5000/admin/`
-- **Documentation**: `http://localhost:5000/docs`
+
 
 ### MetaTrader 5 Integration
 1.  Copy the scripts from the `MQ5` directory to your MT5 `MQL5/Scripts` folder.
-2.  Attach `CandleDataSender.mq5` to the charts you wish to monitor.
 
 
 
