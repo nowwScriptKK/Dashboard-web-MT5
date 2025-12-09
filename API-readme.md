@@ -5,15 +5,15 @@ This directory contains the API endpoints for the Trading AI Booster server. The
 ## 📚 Table of Contents
 
 - [Accounts](#accounts)
-- [Symbols](#symbols)
+- [Symbols & Config](#symbols-config)
 - [Trades](#trades)
 - [Candles](#candles)
+- [Ticks](#ticks)
 - [Announcements](#announcements)
-- [Trade Notes](#trade-notes)
-- [Trading Signals](#trading-signals)
+- [Signals & AI](#signals-ai)
+- [Statistics & Data](#statistics-data)
 - [System Logs](#system-logs)
-- [AI Responses](#ai-responses)
-- [Statistics](#statistics)
+- [Real-time Stream](#real-time-stream)
 - [Telegram](#telegram)
 
 ---
@@ -24,242 +24,228 @@ Manage trading accounts and retrieve account information.
 
 ### `GET /accounts`
 Retrieve a list of all registered trading accounts.
-- **Response:** Array of account objects (id, account_number, broker).
+- **Response:** Array of account objects.
 
 ### `GET /account`
 Retrieve detailed information for a specific account.
-- **Query Params:**
-  - `account_number` (Optional): Filter by account number. If not provided, returns the first found account.
-- **Response:** Detailed account object (balance, equity, margin, free_margin, etc.).
+- **Query Params:** `account_number`
+- **Response:** Detailed account object.
 
 ### `POST /accounts/update`
-Update or create account information (typically called from MT5/MQ5).
-- **Body:**
-  - `account_number` (Required): string
-  - `balance`: float
-  - `equity`: float
-  - `margin`: float
-  - `free_margin`: float
-  - `margin_level`: float
-  - `leverage`: int
-  - `server`: string
-  - `broker`: string
-  - `currency`: string
+Update or create account information (from MT5).
+- **Body:** `account_number`, `balance`, `equity`, `margin`, `free_margin` `broker`, `currency`, etc.
 
 ---
 
-## <a name="symbols"></a> 📈 Symbols
-
-Retrieve available trading symbols and configurations.
+## <a name="symbols-config"></a> ⚙️ Symbols & System Config
 
 ### `GET /symbols`
 Get a list of all available symbols.
-- **Response:** Array of symbol strings (e.g., `["EURUSD", "GBPUSD"]`).
 
 ### `GET /symbol-config`
-Get enabled symbols from the configuration. This is used by the trading terminal to know which symbols to trade.
-- **Response:** Array of enabled symbol strings.
+Get enabled symbols from the configuration.
+
+### `GET /system-config`
+Get system configuration parameters.
+
+### `POST /system-config`
+Update or create a system configuration key-value pair.
+- **Body:** `key`, `value`, `category`, `description`
 
 ### `DELETE /admin/symbolconfig/delete/`
 Delete a symbol configuration (Admin only).
-- **Query Params:**
-  - `id` (Required): ID of the symbol config to delete.
+- **Query Params:** `id`
 
 ---
 
 ## <a name="trades"></a> 🔄 Trades
 
-Manage and retrieve trade history and active positions.
+Trade history and management.
 
 ### `GET /trades`
 Get a list of trades.
-- **Query Params:**
-  - `state`: Filter by trade state ('open' or 'history').
-  - `account_number`: Filter by specific account.
-- **Response:** Array of trade objects.
+- **Query Params:** `state` ('open', 'history'), `account_number`
 
 ### `POST /trades`
 Create or update a single trade.
-- **Body:**
-  - `ticket` (Required): int - MT5 ticket number
-  - `account_number`: string
-  - `symbol`: string
-  - `type`: int (0=Buy, 1=Sell)
-  - `volume`: float
-  - `open_price`: float
-  - `open_time`: string (YYYY-MM-DD HH:MM:SS)
-  - ... other trade fields
+- **Body:** `ticket`, `symbol`, `type`, `volume`, `open_price`, `open_time`, etc.
 
 ### `POST /trades/batch`
-Batch create or update trades for better performance.
-- **Body:**
-  - `trades`: Array of trade objects.
+Batch create/update trades.
+- **Body:** `trades` (Array of trade objects)
 
 ### `PUT /trades/<id>`
-Update a specific trade by its internal DB ID.
-- **Path Params:** `id` (Internal Database ID)
-- **Body:** Key-value pairs of fields to update.
+Update a specific trade by internal ID.
+- **Body:** Fields to update.
 
 ### `POST /trades/<id>/rating`
-Update the user rating for a specific trade.
-- **Path Params:** `id` (Internal Database ID)
-- **Body:**
-  - `rating`: int (0-5)
+Update user rating for a trade.
+- **Body:** `rating` (0-5)
+
+### `GET /trade-notes`
+Get trade notes.
+- **Query Params:** `trade_ticket`
+
+### `POST /trade-notes`
+Create a trade note.
+- **Body:** `trade_ticket`, `note_content`, `note_title`
+
+### `DELETE /trade-notes/<id>`
+Delete a trade note.
 
 ---
 
 ## <a name="candles"></a> 🕯️ Candles
 
-Historical market data management.
+Historical chart data.
 
 ### `GET /candles`
 Retrieve historical candle data.
-- **Query Params:**
-  - `symbol` (Default: EURUSD)
-  - `timeframe` (Default: H1)
-  - `limit`: Number of candles to return (Default: 200)
-  - `before`: Timestamp to load candles before (for pagination).
-- **Response:** Array of candle objects.
+- **Query Params:** `symbol`, `timeframe`, `limit`, `before`
 
 ### `GET /candles/last`
-Get the timestamp of the last recorded candle. Used for synchronization.
-- **Query Params:**
-  - `symbol` (Required)
-  - `timeframe` (Required)
-- **Response:** `{ "timestamp": "...", "exists": boolean }`
+Get timestamp of the last recorded candle.
+- **Query Params:** `symbol`, `timeframe`
 
 ### `POST /candles`
-Bulk add or update candles.
-- **Body:**
-  - `symbol`: string
-  - `timeframe`: string
-  - `candles`: Array of candle objects (`timestamp`, `open`, `high`, `low`, `close`, `volume`).
+Bulk add candles.
+- **Body:** `symbol`, `timeframe`, `candles` (Array)
+
+---
+
+## <a name="ticks"></a> 📉 Ticks
+
+High-frequency tick data.
+
+### `GET /ticks`
+Get recent ticks.
+- **Query Params:** `symbol`, `limit`
+
+### `POST /ticks`
+Add a single tick.
+- **Body:** `symbol`, `bid`, `ask`
+
+### `POST /ticks/batch`
+Batch add ticks (Ultra-fast Redis ingestion).
+- **Body:** `ticks` (Array)
+
+### `POST /ticks/aggregate`
+Aggregate ticks into a candle for a specific timeframe.
+- **Body:** `symbol`, `timeframe`
+
+### `GET /ticks/stream`
+Stream ticks via Server-Sent Events (SSE).
 
 ---
 
 ## <a name="announcements"></a> 📢 Announcements
 
-Economic calendar announcements.
+Economic calendar and news processing.
 
 ### `GET /announcements`
-Get economic announcements.
-- **Query Params:**
-  - `status`: 'pending' (default), 'all', or 'processed'.
-  - `search`: Filter by text or symbol.
-  - `page`: Page number.
-  - `per_page`: Items per page.
-  - `filter_type`: 'all', 'buy', 'sell' (for processed).
+Get announcements.
+- **Query Params:** `status`, `search`, `page`, `filter_type`
+
+### `POST /announcements/new`
+**Core Automation Endpoint**: Receives raw announcement text, analyzes it with DeepSeek AI, creates a trading signal if confidence is high, and sends Telegram notifications.
+- **Body:** `announcement_text` (Required), `symbol`, `source_type`
+
+### `POST /announcements/<id>/process`
+Mark an announcement as processed manually.
+
+### `GET /announcements/stats`
+Get statistics about announcement analysis (Total, Today, Buy/Sell counts).
 
 ---
 
-## <a name="trade-notes"></a> 📝 Trade Notes
+## <a name="signals-ai"></a> 🚦 Signals & AI
 
-User notes attached to trades.
-
-### `GET /trade-notes`
-Get trade notes.
-- **Query Params:**
-  - `trade_ticket`: Filter by specific trade ticket.
-
-### `POST /trade-notes`
-Create a new note for a trade.
-- **Body:**
-  - `trade_ticket` (Required)
-  - `note_content` (Required)
-  - `note_title` (Optional)
-
-### `DELETE /trade-notes/<id>`
-Delete a specific trade note.
-
----
-
-## <a name="trading-signals"></a> 🚦 Trading Signals
-
-Signals generated by the AI or external sources.
+Trading signals and AI reasoning.
 
 ### `GET /trading-signals`
 Get a list of trading signals.
-- **Query Params:**
-  - `status`: Filter by status (e.g., 'new', 'executed').
+- **Query Params:** `status`
 
-### `POST /trading-signals/<signal_id>/update`
-Update the status of a trading signal.
-- **Path Params:** `signal_id` (UUID or DB ID)
-- **Body:**
-  - `status`: New status string.
-  - `trade_ticket`: Optional ticket number if executed.
+### `GET /trading-signals/pending`
+Get pending signals for execution (used by defined terminals).
+
+### `GET /signals`
+Get all signals (alternative endpoint).
+
+### `POST /signals`
+Create or update a signal manually.
+
+### `POST /trading-signals/<id>/update`
+Update signal status (e.g., 'executed', 'rejected').
+- **Body:** `status`, `trade_ticket`
+
+### `POST /signals/<signal_id>/work`
+Mark a signal as "in progress" (Work status).
+
+### `GET /ai-signals`
+Get AI signals with visualization data (time, entry, confidence).
+- **Query Params:** `symbol`, `days`
+
+### `GET /ai-responses`
+Get raw AI analysis responses.
+- **Query Params:** `announcement_id`
+
+---
+
+## <a name="statistics-data"></a> 📊 Statistics & Data
+
+### `GET /full-stats`
+Comprehensive dashboard statistics (Capital, Risk, Portfolio, AI breakdown).
+
+### `GET /statistics/data`
+Advanced statistics including correlations and detailed candle stats.
+- **Query Params:** `correlation_timeframe`, `correlation_candles`, `min_confidence`, `max_confidence`
+
+### `GET /statistics/recommendations`
+Get AI-driven improvement recommendations based on stats.
 
 ---
 
 ## <a name="system-logs"></a> 🖥️ System Logs
 
-Access server logs and diagnostics.
-
 ### `GET /system-logs`
-Get basic system logs.
-- **Query Params:**
-  - `level`: Filter by log level.
-  - `limit`: Max logs to return.
+Basic system logs.
 
 ### `GET /logs/enhanced`
-Get logs with advanced filtering options.
-- **Query Params:**
-  - `level`, `module`, `limit`
+Filtered logs.
+- **Query Params:** `level`, `module`, `limit`
 
 ### `GET /logs/stats`
-Get statistics about log distribution (counts per level, module).
+Log statistics.
 
 ### `GET /logs/errors`
-Get a summary of recent errors and critical alerts.
+Recent errors and critical alerts.
 
 ### `POST /logs/cleanup`
-Delete old logs to free up space.
-- **Body:**
-  - `days`: int (Delete logs older than X days, default 30).
+Delete old logs.
+- **Body:** `days`
 
 ---
 
-## <a name="ai-responses"></a> 🤖 AI Responses
+## <a name="real-time-stream"></a> 📡 Real-time Stream
 
-History of AI analyses and decisions.
-
-### `GET /ai-responses`
-Get AI analysis records.
-- **Query Params:**
-  - `announcement_id`: Filter by specific announcement.
-
----
-
-## <a name="statistics"></a> 📊 Statistics
-
-Aggregated performance metrics.
-
-### `GET /full-stats`
-Get comprehensive statistics for the dashboard, including:
-- Capital history chart data.
-- Risk management metrics (Win rate, Drawdown, Profit Factor).
-- Portfolio exposure distribution.
-- AI signal distribution (Buy/Sell/Hold).
+### `GET /stream/all`
+**Universal Stream**: SSE endpoint streaming Ticks, Candles, Trades, and Account updates in real-time.
 
 ---
 
 ## <a name="telegram"></a> 📱 Telegram
 
-Telegram bot integration endpoints.
-
 ### `GET /telegram/users`
-Get a list of configured Telegram users and admins.
+List configured Telegram users.
 
 ### `POST /telegram/send`
-Send a custom message to specific users.
-- **Body:**
-  - `recipients`: Array of user IDs.
-  - `message`: Text content.
-  - `image_url`: Optional image path.
-  - `parse_mode`: 'HTML' or 'Markdown'.
+Send custom message.
+- **Body:** `recipients`, `message`, `image_url`
 
 ### `POST /telegram/upload-image`
-Upload an image to be sent via Telegram.
-- **Form Data:**
-  - `image`: File object.
-- **Response:** `url` relative path to the uploaded image.
+Upload image for Telegram.
+- **Form Data:** `image`
+
+### `POST /telegram/webhook`
+Handle incoming Telegram updates (Webhooks).
